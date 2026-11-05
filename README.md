@@ -10,7 +10,7 @@ It only looks. Nothing gets patched, and the scan runs in a systemd sandbox that
 
 ```hcl
 module "trivy" {
-  source = "github.com/conn3xorg/circuit-trivy?ref=v0.1.0"
+  source = "github.com/conn3xorg/circuit-trivy?ref=v0.1.1"
 
   hosts                = { web = "203.0.113.10", db = "203.0.113.11" }
   ssh_private_key_file = "~/.ssh/id_ed25519"
