@@ -36,7 +36,8 @@ variable "ssh_become" {
 variable "trivy_version" {
   type        = string
   default     = "0.76.1"
-  description = "Trivy release to install from GitHub. Change checksums with it."
+  nullable    = false
+  description = "Trivy release to install from GitHub. Change checksums with it. Raising it upgrades Trivy in place. Null means the default."
 
   validation {
     condition     = can(regex("^[0-9]+\\.[0-9]+\\.[0-9]+$", var.trivy_version))
@@ -51,7 +52,8 @@ variable "trivy_version" {
 
 variable "checksums" {
   type        = map(string)
-  description = "SHA-256 of the release tarball for each architecture, from the release's trivy_<version>_checksums.txt. Change these with trivy_version."
+  description = "SHA-256 of the release tarball for each architecture, from the release's trivy_<version>_checksums.txt. Change these with trivy_version. Null means the default."
+  nullable    = false
   default = {
     amd64 = "c7cbe3137fb8a48a17574bede3dd6beb16742d1e9772929940fc90082c39d9c0"
     arm64 = "e174dff2a6dba5e3ae41f8d0537a6324405bd08132497340304c6b20e0f16a1f"

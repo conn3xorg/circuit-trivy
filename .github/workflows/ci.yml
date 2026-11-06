@@ -74,6 +74,41 @@ jobs:
       - name: Plant a vulnerable package, scan through the timer's service, check the report
         working-directory: examples/local
         run: sudo podman exec -i circuit-trivy sh < check.sh
+      # Restarting the container boots systemd again, so this checks the
+      # timer comes back by itself, a scan still reports the planted hole,
+      # and the plan has nothing to do.
+      - name: Restart the host, then scan again and check the plan
+        working-directory: examples/local
+        run: |
+          sudo podman restart circuit-trivy
+          for _ in $(seq 60); do
+            case $(sudo podman exec circuit-trivy systemctl is-system-running 2>/dev/null) in running|degraded) break ;; esac
+            sleep 1
+          done
+          sudo podman exec circuit-trivy systemctl is-active conn3x-trivy.timer
+          sudo podman exec -i circuit-trivy sh < check.sh
+          conn3x plan -detailed-exitcode
+      # A fresh host gets the previous release, then the circuit's own pin is
+      # applied over it, the way someone raises trivy_version.
+      - name: Upgrade from Trivy 0.76.0 on a fresh host, then plan again with no changes
+        working-directory: examples/local
+        env:
+          CONTAINERFILE: ${{ github.workspace }}/conn3x/test/images/${{ matrix.distro }}/Containerfile
+          PODMAN: sudo podman
+        run: |
+          ./down.sh
+          ./up.sh
+          conn3x init
+          conn3x apply -auto-approve -var trivy_version=0.76.0 \
+            -var 'checksums={amd64="e24b1c51293c1b15e4ba8d45bbc7891ba053f90278ec2698f3562c993e145fe7",arm64="aab21e677a7b7071fc79f1711480840754c18a1b9d9cefa7ccd06af63a0e8f4c"}'
+          sudo podman exec circuit-trivy trivy --version | grep -qx 'Version: 0.76.0'
+          conn3x apply -auto-approve
+          conn3x plan -detailed-exitcode
+          want=$(sed -n '/variable "trivy_version"/,/^}/s/.*default *= *"\(.*\)"/\1/p' ../../variables.tf)
+          sudo podman exec circuit-trivy trivy --version | grep -qx "Version: $want"
+      - name: Check the upgraded Trivy still reports the planted hole
+        working-directory: examples/local
+        run: sudo podman exec -i circuit-trivy sh < check.sh
       - name: Clean up
         if: always()
         working-directory: examples/local
