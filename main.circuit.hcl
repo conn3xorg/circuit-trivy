@@ -173,8 +173,8 @@ circuit "trivy" {
   }
 
   step "sandbox_applied" {
-    command {
-      command  = "systemctl daemon-reload"
+    service_action {
+      action   = "daemon-reload"
       triggers = { sandbox = conn3x_file.trivy__sandbox[each.key].revision }
     }
   }
