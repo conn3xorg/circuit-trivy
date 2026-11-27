@@ -10,7 +10,7 @@ It only looks. Nothing gets patched, and the scan runs in a systemd sandbox that
 
 ```hcl
 module "trivy" {
-  source = "github.com/conn3xorg/circuit-trivy?ref=v0.2.0"
+  source = "github.com/conn3xorg/circuit-trivy?ref=v0.3.0"
 
   hosts                = { web = "203.0.113.10", db = "203.0.113.11" }
   ssh_private_key_file = "~/.ssh/id_ed25519"
@@ -170,7 +170,7 @@ Trivy has no vulnerability data for Fedora's packages. On Fedora 45 it logs `Uns
 
 ## Requirements
 
-Requires Conn3x v0.29.0 or later and systemd on each host. Hosts need to reach GitHub for the release, and `mirror.gcr.io` or `ghcr.io` for the database. Leave 2 GB to 4 GB free for the database. The droplets it was tested on had 2 GB of memory; a 1 GB host wasn't tried.
+Requires Conn3x v0.37.0 or later and systemd on each host. Hosts need to reach GitHub for the release, and `mirror.gcr.io` or `ghcr.io` for the database. Leave 2 GB to 4 GB free for the database. The droplets it was tested on had 2 GB of memory; a 1 GB host wasn't tried.
 
 ## Tested on
 
